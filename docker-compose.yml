@@ -1,0 +1,14 @@
+version: '3.9'
+
+services:
+  mysql:
+    build: .
+    ports:
+      - 3306:3306
+    volumes:
+      - .:/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=S3cret
+      - MYSQL_PASSWORD=user
+      - MYSQL_USER=user
+      - MYSQL_DATABASE=mydb
