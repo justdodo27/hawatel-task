@@ -21,6 +21,7 @@ Other requirements:
 - To run the container in the background type `docker-compose up -d`
 - To stop the container type `docker-compose stop`
 - To delete the database and it's volumes type `docker-compose down -v`
+- To open mysql shell type `docker-compose exec mysql /bin/bash` while the container is running and after that type `mysql -u user -puser`
 
 
 
