@@ -10,7 +10,7 @@ The project was created for the recruitment process for Hawatel. Given task coul
 Other requirements:
 - Script should be written in OOP
 - Script should be documented
-- Export altered database schema
+- Export [altered database schema](https://github.com/justdodo27/hawatel-task/blob/main/AlteredStructure.sql)
 - Script should use logging module
 - Script should handle exceptions
 - Optional: Script should be created in python packaging format to install the script with `pip install <module_name>.whl`
