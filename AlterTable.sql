@@ -1,5 +1,5 @@
 ALTER TABLE `mydb`.`Product`
-ADD `UnitPriceUSD` DECIMAL NOT NULL
+ADD `UnitPriceUSD` DECIMAL(12,2) NOT NULL
 AFTER `UnitPrice`,
-ADD `UnitPriceEuro` DECIMAL NOT NULL
+ADD `UnitPriceEuro` DECIMAL(12,2) NOT NULL
 AFTER `UnitPrice`;
