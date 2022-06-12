@@ -1,7 +1,6 @@
 import mysql.connector
 import typing
 
-
 class SQLConnector:
     """
     A class to represent a SQL connector.
@@ -12,6 +11,8 @@ class SQLConnector:
     ----------
     config : dict
         database configuration
+    logger : Logger object
+        logger object for debuging
 
 
     Methods
@@ -23,7 +24,7 @@ class SQLConnector:
     get_products():
         Query all products from database.
     """
-    def __init__(self, config: typing.Dict):
+    def __init__(self, config: typing.Dict, logger):
         """
         Constructs all the necessary atributes for the SQLConnector object.
 
@@ -31,8 +32,11 @@ class SQLConnector:
         ----------
             config : dict
                 database configuration
+            logger : Logger object
+                logger object for debuging
         """
         self.config = config
+        self.logger = logger
 
     def _test_connection(self):
         with mysql.connector.connect(**self.config) as conn:
@@ -45,7 +49,12 @@ class SQLConnector:
         Returns:
             conn: mysql connection object
         """
-        return mysql.connector.connect(**self.config)
+        try:
+            conn = mysql.connector.connect(**self.config)
+            return conn
+        except mysql.connector.Error as err:
+            self.logger.error(f"{err}")
+            raise SystemExit(err)
 
     def update_products(self, rates: typing.Dict[float, float]):
         """
@@ -57,17 +66,22 @@ class SQLConnector:
                 store currency rates
         """
         mydb = self.connect()
-        cur = mydb.cursor()
+        
+        try:
+            cur = mydb.cursor()
+            sql = """UPDATE Product
+            SET UnitPriceUSD = UnitPrice * %s,
+            UnitPriceEuro = UnitPrice * %s
+            """
 
-        sql = """UPDATE Product
-        SET UnitPriceUSD = UnitPrice * %s,
-        UnitPriceEuro = UnitPrice * %s
-        """
+            cur.execute(sql, (rates["usd"], rates["euro"]))
+            mydb.commit()
+            print(cur.rowcount, "records affected")
+            mydb.close()
+        except mysql.connector.Error as err:
+            self.logger.error(f"{err}")
+            raise SystemExit(err)
 
-        cur.execute(sql, (rates["usd"], rates["euro"]))
-        mydb.commit()
-        print(cur.rowcount, "records affected")
-        mydb.close()
 
     def get_products(self):
         """
@@ -77,17 +91,22 @@ class SQLConnector:
             results: list of products
         """
         mydb = self.connect()
-        cur = mydb.cursor()
 
-        sql = """SELECT ProductID, DepartmentID, Category,
-        IDSKU, ProductName, Quantity, UnitPrice, 
-        UnitPriceUSD, UnitPriceEuro, Ranking,
-        ProductDesc, UnitsInStock, UnitsInOrder
-        FROM Product
-        """
+        try:
+            cur = mydb.cursor()
 
-        cur.execute(sql)
-        results = cur.fetchall()
-        mydb.close()
+            sql = """SELECT ProductID, DepartmentID, Category,
+            IDSKU, ProductName, Quantity, UnitPrice, 
+            UnitPriceUSD, UnitPriceEuro, Ranking,
+            ProductDesc, UnitsInStock, UnitsInOrder
+            FROM Product
+            """
 
-        return results
+            cur.execute(sql)
+            results = cur.fetchall()
+            mydb.close()
+
+            return results
+        except mysql.connector.Error as err:
+            self.logger.error(f"{err}")
+            raise SystemExit(err)
