@@ -57,13 +57,12 @@ class CurrencyFetch:
 
         try:
             response = requests.get(self.url, headers=self.headers)
-            if response.status_code == 200:
-                self.logger.info(f"Succesfully fetched exchange rate")
-            elif response.status_code == 404:
+            if response.status_code == 404:
                 raise APIResponse404
             data = json.loads(response.text)
+            self.logger.info(f"Succesfully fetched exchange rate for {data['currency']}")
             return data
         except APIResponse404:
             self.logger.error("API response with HTTP 404 Not Found")
-            raise SystemExit("API response with HTTP 404 Not Found")
+            raise SystemExit("Cannot fetch the data")
 

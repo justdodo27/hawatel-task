@@ -38,10 +38,6 @@ class SQLConnector:
         self.config = config
         self.logger = logger
 
-    def _test_connection(self):
-        with mysql.connector.connect(**self.config) as conn:
-            print(conn)
-
     def connect(self):
         """
         Connects with database.
@@ -51,10 +47,12 @@ class SQLConnector:
         """
         try:
             conn = mysql.connector.connect(**self.config)
+            self.logger.info("Got connection with database")
+            self.logger.debug(conn)
             return conn
         except mysql.connector.Error as err:
             self.logger.error(f"{err}")
-            raise SystemExit(err)
+            raise SystemExit("Cannot connect with the database")
 
     def update_products(self, rates: typing.Dict[float, float]):
         """
@@ -76,11 +74,11 @@ class SQLConnector:
 
             cur.execute(sql, (rates["usd"], rates["euro"]))
             mydb.commit()
-            print(cur.rowcount, "records affected")
             mydb.close()
         except mysql.connector.Error as err:
             self.logger.error(f"{err}")
-            raise SystemExit(err)
+            raise SystemExit("Database error")
+        self.logger.info("Products successfully updated")
 
 
     def get_products(self):
@@ -105,8 +103,9 @@ class SQLConnector:
             cur.execute(sql)
             results = cur.fetchall()
             mydb.close()
-
+            self.logger.info(f"Fetched {len(results)} products")
+            self.logger.debug(results)
             return results
         except mysql.connector.Error as err:
             self.logger.error(f"{err}")
-            raise SystemExit(err)
+            raise SystemExit("Database error")
