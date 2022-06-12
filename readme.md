@@ -16,6 +16,8 @@ Other requirements:
 - Optional: Script should be created in python packaging format to install the script with `pip install <module_name>.whl`
 
 ## Installation
+
+### Database
 - To create the database type `docker-compose up --build`
 - To run the container type `docker-compose up`
 - To run the container in the background type `docker-compose up -d`
@@ -23,7 +25,41 @@ Other requirements:
 - To delete the database and it's volumes type `docker-compose down -v`
 - To open mysql shell type `docker-compose exec mysql /bin/bash` while the container is running and after that type `mysql -u user -puser`
 
+### Python Script
+- Create virtual environment `python3 -m venv venv`
+- Change virtual environment `source venv/bin/activate`
+- Install required packages `pip3 install -r requirements.txt`
+- Run script with `python3 script.py`
 
+## Script options
+
+- -h, --help
+
+show help message and exit
+- --host HOST
+
+set database host, default 127.0.0.1
+- --user USER, -u USER
+
+set database user, default user
+- --password PASSWORD, -p PASSWORD
+
+set database password, default user
+- --db DB
+
+set database name, default mydb
+- --export, --no-export, -e
+
+exports data from database to external file
+- --type TYPE
+
+set export file format, default excel
+- --filename FILENAME
+
+set export filename, default ./export
+- --log_path LOG_PATH
+
+set log path, default ./
 
 
 ## Bugs Found
