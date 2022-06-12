@@ -1,6 +1,7 @@
 import argparse
 import logging
 import datetime as dt
+import os
 from currency import CurrencyFetch
 from connector import SQLConnector
 from export import Exporter
@@ -8,19 +9,22 @@ from export import Exporter
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Script for products extraction')
     parser.add_argument("--host", type=str, default='127.0.0.1')
-    parser.add_argument("--user", type=str, default='user')
-    parser.add_argument("--password", type=str, default='user')
+    parser.add_argument("--user", "-u", type=str, default='user')
+    parser.add_argument("--password", "-p", type=str, default='user')
     parser.add_argument("--db", type=str, default='mydb')
-    parser.add_argument("--export", type=bool, default=False)
+    parser.add_argument("--export", "-e", type=bool, default=False, action=argparse.BooleanOptionalAction)
     parser.add_argument("--type", type=str, default='excel')
     parser.add_argument("--filename", type=str, default='./export')
     parser.add_argument("--log_path", type=str, default='./')
 
     args = parser.parse_args()
     
-    date = dt.datetime.now()
-    logging.basicConfig(filename=f"{args.log_path}log-{date.strftime('%d-%m-%Y %H:%M:%S')}.txt", filemode='w', format="%(levelname)s:%(message)s", level=logging.DEBUG)
     logger = logging.getLogger('script logger')
+    date = dt.datetime.now()
+    try:
+        logging.basicConfig(filename=f"{args.log_path}log-{date.strftime('%d-%m-%Y %H:%M:%S')}.txt", filemode='w', format="%(levelname)s:%(message)s", level=logging.DEBUG)
+    except FileNotFoundError as e:
+        raise SystemExit(f"No such directory {args.log_path}")
 
     CONFIG = {
         "host": args.host,
