@@ -1,10 +1,10 @@
 import requests
 import json
 import typing
-import logging
 
-logging.basicConfig(format="%(levelname)s:%(message)s", level=logging.DEBUG)
-
+class APIResponse404(Exception):
+    """Raised when API responds with 404"""
+    pass
 
 class CurrencyFetch:
     """
@@ -20,6 +20,8 @@ class CurrencyFetch:
         url from which the data will be fetched
     headers : dict
         header for request fetch
+    logger : Logger object
+        logger object for debuging
 
 
     Methods
@@ -27,7 +29,7 @@ class CurrencyFetch:
     _fetch():
         Fetchs the currency data from NBP API.
     """
-    def __init__(self, *, code: str):
+    def __init__(self, *, code: str, logger):
         """
         Constructs all the necessary atributes for the CurrencyFetch object.
 
@@ -35,12 +37,15 @@ class CurrencyFetch:
         ----------
             code : str
                 currency code
+            logger : Logger object
+                logger object for debuging
         """
         self.code = code
         self.url = (
-            f"http://api.nbp.pl/api/exchangerates/rates/a/{self.code}/"
+            f"http://api.nbp.pl/apj/exchangerates/rates/a/{self.code}/"
         )
         self.headers = {"Accept": "application/json"}
+        self.logger = logger
 
     def _fetch(self) -> typing.Dict:
         """
@@ -49,12 +54,16 @@ class CurrencyFetch:
         Returns:
             data (dict): Dictionary data of the currency rate
         """
-        response = requests.get(self.url, headers=self.headers)
-        if response.status_code == 200:
-            logging.info(f"Succesfully fetched exchange rate")
-        else:
-            logging.error(f"API response with {response.status_code}")
-            return None
-        data = json.loads(response.text)
 
-        return data
+        try:
+            response = requests.get(self.url, headers=self.headers)
+            if response.status_code == 200:
+                self.logger.info(f"Succesfully fetched exchange rate")
+            elif response.status_code == 404:
+                raise APIResponse404
+            data = json.loads(response.text)
+            return data
+        except APIResponse404:
+            self.logger.error("API response with HTTP 404 Not Found")
+            raise SystemExit("API response with HTTP 404 Not Found")
+
