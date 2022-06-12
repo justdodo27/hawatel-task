@@ -71,13 +71,19 @@ class SQLConnector:
             SET UnitPriceUSD = UnitPrice * %s,
             UnitPriceEuro = UnitPrice * %s
             """
-
+            if not isinstance(rates["usd"], float):
+                raise ValueError("Invalid type passes as rates[\"usd\"]")
+            if not isinstance(rates["euro"], float):
+                raise ValueError("Invalid type passes as rates[\"euro\"]")
             cur.execute(sql, (rates["usd"], rates["euro"]))
             mydb.commit()
             mydb.close()
         except mysql.connector.Error as err:
             self.logger.error(f"{err}")
             raise SystemExit("Database error")
+        except ValueError as err:
+            self.logger.error(f"{err}")
+            raise SystemExit("Invalid type passed as currency rate")
         self.logger.info("Products successfully updated")
 
 
