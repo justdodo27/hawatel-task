@@ -42,7 +42,7 @@ class CurrencyFetch:
         """
         self.code = code
         self.url = (
-            f"http://api.nbp.pl/apj/exchangerates/rates/a/{self.code}/"
+            f"http://api.nbp.pl/api/exchangerates/rates/a/{self.code}/"
         )
         self.headers = {"Accept": "application/json"}
         self.logger = logger
